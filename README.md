@@ -4,6 +4,7 @@ Basic LinkedIn scraper that uses PySpark to find and process a searched person/p
 to the very basics in a simple, compressed format
 
 **CSV and MongoDB support coming 12/23/2021**
+
 **Load times may vary based on Internet connection**
 
 Prerequisites

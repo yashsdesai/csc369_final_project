@@ -29,5 +29,7 @@ Install
 
     python3 scraper.py
 
-5.) If prompted with an error, update path of browser in the commented code
+5.) If prompted with an error, update path of browser in the commented code. You can do this by running the following in your terminal:
+
+    which google-chrome
  

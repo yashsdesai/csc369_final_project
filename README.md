@@ -7,9 +7,9 @@ to the very basics in a simple, compressed format
 
 Prerequisites
 *************
-  -PySpark
+    -PySpark
   
-  -Chromium-based Web Browser
+    -Chromium-based Web Browser
   
 Install
 ********

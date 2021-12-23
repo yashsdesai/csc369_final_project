@@ -21,11 +21,13 @@ Install
 
 2.) Run install script
 
-    'bash install.sh'
+    bash install.sh
 
 3.) When prompted, enter your LinkedIn credentials
 
-4.) When install script completes, run using 'python3 scraper.py'
+4.) When install script completes, run the scraper 
+
+    python3 scraper.py
 
 5.) If prompted with an error, update path of browser in the commented code
  

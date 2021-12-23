@@ -15,11 +15,15 @@ Prerequisites
   
 Install
 ********
-1.) Run 'bash install.sh'
+1.) Clone the repository to your machine
+    git clone https://github.com/yashsdesai/csc369_final_project
 
-2.) When prompted, enter your LinkedIn Credentials
+2.) Run install script
+    'bash install.sh'
 
-3.) When install script completes, run using 'python3 scraper.py'
+3.) When prompted, enter your LinkedIn credentials
 
-4.) If prompted with an error, update path of browser in the commented code
+4.) When install script completes, run using 'python3 scraper.py'
+
+5.) If prompted with an error, update path of browser in the commented code
  

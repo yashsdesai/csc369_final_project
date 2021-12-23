@@ -7,13 +7,17 @@ to the very basics in a simple, compressed format
 
 Prerequisites
 *************
-  -PySpark\n
-  -Chromium-based Web Browser\n
+  -PySpark
+  
+  -Chromium-based Web Browser
   
 Install
 ********
 1.) Run 'bash install.sh'
+
 2.) When prompted, enter your LinkedIn Credentials
+
 3.) When install script completes, run using 'python3 scraper.py'
+
 4.) If prompted with an error, update path of browser in the commented code
  

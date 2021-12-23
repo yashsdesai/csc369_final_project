@@ -16,10 +16,10 @@ Prerequisites
 Install
 ********
 1.) Clone the repository to your machine
-    git clone https://github.com/yashsdesai/csc369_final_project
+        git clone https://github.com/yashsdesai/csc369_final_project
 
 2.) Run install script
-    'bash install.sh'
+        'bash install.sh'
 
 3.) When prompted, enter your LinkedIn credentials
 

@@ -5,6 +5,8 @@ apt install python3-pip
 
 pip install selenium
 pip install rsa
+sudo apt install openjdk-8-jdk
+
 
 chmod +x $(pwd)/chromedriver
 echo 'export PATH="$pwd/ChromeDriver:$PATH"' >> ~/.profile

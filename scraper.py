@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.service import Service
 from pyspark import SparkConf
 from pyspark import SparkContext
 import rsa
@@ -14,7 +15,7 @@ import csv
 
 LOAD_DELAY = 3
 
-#sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
+sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
 def scrape_jobs(driver):
     jobs = driver.execute_script(
@@ -35,10 +36,7 @@ def scrape_jobs(driver):
         "els[i].getElementsByTagName('a')[0].href;       } catch (err) {company_url = ''; }        jobs.push("
         "[position, company_name, company_url, date_ranges, job_location]);     }   } } return jobs; })();")
 
-    parsed_jobs = []
-
-
-    return parsed_jobs
+    return jobs
 
 def search(driver, name, university=None, company=None):
     search_bars = driver.find_elements(By.CLASS_NAME, "search-global-typeahead__input")
@@ -63,7 +61,10 @@ def search(driver, name, university=None, company=None):
         except:
             print("failed")
 
-
+def print_single_result(name, rdd):
+    print(name + ": {")
+    for i in rdd.collect():
+        print("\t" + i + ",")
 
 if __name__== "__main__":
 
@@ -72,65 +73,59 @@ if __name__== "__main__":
     print("Welcome to Scraper 1.0")
     print("**WARNING: ONLY COMPATIBLE WITH CHROMIUM-BASED BROWSERS**")
 
-    if(len(sys.argv) > 1):
-        #csv
-        try:
-            pass
-        except:
-            pass
-
-    else:
-        f = open("credentials.txt", "rt")
-        email = f.readline()
-        password = f.readline()
-        f.close()
-
-        print("For any unknown fields, hit RETURN")
-        name = input("Enter name: ")
-        university = input("Enter university: ")
-        company = input("Enter company: ")
-
-        driver_path = str(os.getcwd()) + "/chromedriver"
-        options = Options()
-        options.binary_location = "/usr/bin/brave-browser"
-
-        driver = webdriver.Chrome(options=options, executable_path=driver_path)
-
-        driver.set_window_size(3000, 1024)
+    f = open("credentials.txt", "rt")
+    email = f.readline()
+    password = f.readline()
+    f.close()
 
 
-        if(name == None or name == ""):
-            print("Name is required")
-            exit()
+    print("For any unknown fields, hit RETURN")
+    name = input("Enter name: ")
+    university = input("Enter university: ")
+    company = input("Enter company: ")
 
-        driver.get("https://linkedin.com/login")
-        time.sleep(LOAD_DELAY)
+    # Initialize chromium webdriver
+    driver_path = str(os.getcwd()) + "/chromedriver"
+    service = Service(driver_path)
+    options = Options()
 
+    # replace with your own browser path
+    options.binary_location = "/usr/bin/brave-browser"
 
-        driver.find_element(By.ID, "username").send_keys(email)
-        driver.find_element(By.ID, "password").send_keys(password)
-        #driver.find_element(By.ID, "password").send_keys(Keys.RETURN)
+    driver = webdriver.Chrome(options=options, service=service)
+    driver.set_window_size(3000, 1024)
 
-        driver.get("https://linkedin.com/feed/")
-        time.sleep(LOAD_DELAY)
-
-        search(driver, name, university, company)
-        time.sleep(LOAD_DELAY)
-
-
-        scrape_jobs(driver)
-
+    if(name == None or name == ""):
+        print("Name is required")
         exit()
-        contact_card = driver.find_element(By.LINK_TEXT, "Contact info")
-        contact_card.click()
-        time.sleep(LOAD_DELAY)
 
-        contact_body = driver.find_element(By.TAG_NAME, "section")
-        print(contact_body.text)
+    driver.get("https://linkedin.com/login")
+    time.sleep(LOAD_DELAY)
 
-        # div = experience.find_element(By.CLASS_NAME, "pvs-list__outer-container")
-        # ul = div.find_element(By.TAG_NAME, "ul")
-        # jobs = ul.find_elements(By.TAG_NAME, "li")
+
+    driver.find_element(By.ID, "username").send_keys(email)
+    driver.find_element(By.ID, "password").send_keys(password)
+    #driver.find_element(By.ID, "password").send_keys(Keys.RETURN)
+
+    driver.get("https://linkedin.com/feed/")
+    time.sleep(LOAD_DELAY)
+
+    search(driver, name, university, company)
+    time.sleep(LOAD_DELAY)
+
+    jobs = scrape_jobs(driver)
+    jobs_rdd = sc.parallelize(jobs)
+    #role = input("Relevant Role: ")
+
+    #jobs.rdd.filter(lambda x: role in x)
+    jobs_rdd = jobs_rdd.map(lambda x: (x[1], x[0]))
+
+    print("\n" + name + ":")
+
+    for i in jobs_rdd.collect():
+        print(i)
+
+
 
 
 

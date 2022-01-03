@@ -66,12 +66,90 @@ def print_single_result(name, rdd):
     for i in rdd.collect():
         print("\t" + i + ",")
 
+
+def scrape(driver, name, university, company):
+    driver.get("https://linkedin.com/login")
+    time.sleep(LOAD_DELAY)
+
+    driver.find_element(By.ID, "username").send_keys(email)
+    driver.find_element(By.ID, "password").send_keys(password)
+    # driver.find_element(By.ID, "password").send_keys(Keys.RETURN)
+
+    driver.get("https://linkedin.com/feed/")
+    time.sleep(LOAD_DELAY)
+
+    search(driver, name, university, company)
+    time.sleep(LOAD_DELAY)
+
+    jobs = scrape_jobs(driver)
+    driver.close()
+    jobs_rdd = sc.parallelize(jobs)
+    # role = input("Relevant Role: ")
+
+    # jobs.rdd.filter(lambda x: role in x)
+    jobs_rdd = jobs_rdd.map(lambda x: (x[1], x[0]))
+
+    print("\n" + name + ":")
+
+    for i in jobs_rdd.collect():
+        print(i)
+
 if __name__== "__main__":
 
-    print(sys.argv)
     print("Load delay: " + str(LOAD_DELAY))
-    print("Welcome to Scraper 1.0")
+    print("Welcome to Scraper 1.2")
     print("**WARNING: ONLY COMPATIBLE WITH CHROMIUM-BASED BROWSERS**")
+
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "-h":
+            # Usage
+            print("\nUsage: python3 scraper.py [optional csv]")
+            exit()
+
+        else:
+            print(sys.argv[1])
+            # CSV
+            try:
+                rdd_from_csv = sc.textFile(sys.argv[1])
+                f = open("credentials.txt", "rt")
+                email = f.readline()
+                password = f.readline()
+                f.close()
+
+            except:
+                print("Error: CSV not found")
+                exit()
+
+            rdd = rdd_from_csv.map(lambda x: x.split(","))
+            rdd = rdd.map(lambda x: (x[0], x[1], x[2]))
+
+            columns = rdd.collect()[0]
+            data = rdd.collect()[1:]
+            names = []
+            universities = []
+            companies = []
+
+            for i in data:
+                names.append(i[0])
+                universities.append(i[1])
+                companies.append(i[2])
+
+            for j in range(len(names)):
+                # Initialize chromium webdriver
+                driver_path = str(os.getcwd()) + "/chromedriver"
+                service = Service(driver_path)
+                options = Options()
+
+                # replace with your own browser path
+                options.binary_location = "/usr/bin/brave-browser"
+
+                driver = webdriver.Chrome(options=options, service=service)
+                driver.set_window_size(3000, 1024)
+                scrape(driver, names[j], universities[j], companies[j])
+
+
+
+
 
     f = open("credentials.txt", "rt")
     email = f.readline()
@@ -99,33 +177,9 @@ if __name__== "__main__":
         print("Name is required")
         exit()
 
-    driver.get("https://linkedin.com/login")
-    time.sleep(LOAD_DELAY)
+    scrape(driver, name, university, company)
 
-
-    driver.find_element(By.ID, "username").send_keys(email)
-    driver.find_element(By.ID, "password").send_keys(password)
-    #driver.find_element(By.ID, "password").send_keys(Keys.RETURN)
-
-    driver.get("https://linkedin.com/feed/")
-    time.sleep(LOAD_DELAY)
-
-    search(driver, name, university, company)
-    time.sleep(LOAD_DELAY)
-
-    jobs = scrape_jobs(driver)
-    jobs_rdd = sc.parallelize(jobs)
-    #role = input("Relevant Role: ")
-
-    #jobs.rdd.filter(lambda x: role in x)
-    jobs_rdd = jobs_rdd.map(lambda x: (x[1], x[0]))
-
-    print("\n" + name + ":")
-
-    for i in jobs_rdd.collect():
-        print(i)
-
-
+    
 
 
 

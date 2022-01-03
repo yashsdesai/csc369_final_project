@@ -1,6 +1,6 @@
 # csc369_final_project
 
-Basic LinkedIn scraper that uses PySpark to find and process a searched person/people and reduce their profile
+Basic LinkedIn scraper that uses Selenium and PySpark to find and process a searched person/people and reduce their profile
 to the very basics in a simple, compressed format
 
 
